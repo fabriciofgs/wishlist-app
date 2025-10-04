@@ -1,0 +1,46 @@
+services:
+  mongo:
+    image: mongo:latest
+    container_name: wishlist-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: passwd
+      MONGO_INITDB_DATABASE: wishlistdb
+    volumes:
+      - wishlist-data:/data/db
+    ports:
+      - "27017:27017"
+    networks:
+      - wishlist-net
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: wishlist-app:latest
+    container_name: wishlist-app
+    restart: unless-stopped
+    depends_on:
+      - mongo
+    environment:
+      # String de conexão que a aplicação espera
+      SPRING_DATA_MONGODB_URI: mongodb://admin:passwd@mongo:27017/wishlistdb?authSource=admin
+      SERVER_PORT: 8080
+      SPRING_PROFILES_ACTIVE: local
+    ports:
+      - "8080:8080"
+    networks:
+      - wishlist-net
+
+volumes:
+  wishlist-data:
+
+networks:
+  wishlist-net:
+    driver: bridge

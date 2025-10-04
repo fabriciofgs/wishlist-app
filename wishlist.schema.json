@@ -1,0 +1,65 @@
+{
+  "collection": "Wishlist",
+  "schema": {
+    "_id": {
+      "type": "long",
+      "description": "Primary key"
+    },
+    "clientId": {
+      "type": "integer",
+      "required": true,
+      "description": "Foreign key referencing Clients collection"
+    },
+    "clientName": {
+      "type": "string",
+      "description": "Name of the client"
+    },
+    "productId": {
+      "type": "integer",
+      "required": true,
+      "description": "Foreign key referencing Products collection"
+    },
+    "productName": {
+      "type": "string",
+      "description": "Name of the product"
+    },
+    "date": {
+      "type": "date",
+      "format": "ISO 8601",
+      "required": true,
+      "description": "Date the product was added to the wishlist"
+    }
+  },
+  "relationships": {
+    "Clients": {
+      "type": "one-to-many",
+      "localField": "clientId",
+      "foreignField": "_id"
+    },
+    "Products": {
+      "type": "one-to-many",
+      "localField": "productId",
+      "foreignField": "_id"
+    }
+  },
+  "indexes": [
+    {
+      "field": "_id",
+      "unique": true
+    },
+    {
+      "field": "clientId",
+      "foreignKey": {
+        "collection": "Clients",
+        "field": "_id"
+      }
+    },
+    {
+      "field": "productId",
+      "foreignKey": {
+        "collection": "Products",
+        "field": "_id"
+      }
+    }
+  ]
+}
